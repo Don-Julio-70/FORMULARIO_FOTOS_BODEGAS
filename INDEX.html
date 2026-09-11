@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formulario de Registro de Bodega</title>
+<style>
+  :root {
+    --primary: #1a2b4c;
+    --accent: #d9a441;
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --border: #dcdfe4;
+    --text: #22262e;
+    --muted: #6b7280;
+    --success: #2e7d4f;
+    --error: #c0392b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px 16px 60px;
+  }
+  .wrap { max-width: 480px; margin: 0 auto; }
+  h1 {
+    font-size: 20px;
+    color: var(--primary);
+    margin: 0 0 4px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 13px;
+    margin: 0 0 24px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  label {
+    display: block;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+  select {
+    width: 100%;
+    padding: 12px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    font-size: 15px;
+    background: #fff;
+    color: var(--text);
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 18px;
+  }
+  select:disabled {
+    background-color: #f0f1f3;
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  .step-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--border);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    margin-right: 6px;
+  }
+  .step-label.done { background: var(--success); }
+  .photo-card {
+    display: none;
+  }
+  .photo-card.active { display: block; }
+  .photo-input-wrap {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 24px 12px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .photo-input-wrap:active { background: #f7f8fa; }
+  input[type="file"] { display: none; }
+  #preview-wrap { margin-top: 12px; display: none; }
+  #preview-wrap.active { display: block; }
+  #preview {
+    width: 100%;
+    border-radius: 10px;
+    display: block;
+    border: 1px solid var(--border);
+  }
+  .summary {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 12px;
+    background: #f7f8fa;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .summary b { color: var(--text); }
+  button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  #btn-download {
+    background: var(--primary);
+    color: #fff;
+  }
+  #btn-download:disabled {
+    background: var(--border);
+    color: var(--muted);
+    cursor: not-allowed;
+  }
+  #btn-reset {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .status {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 10px;
+    display: none;
+  }
+  .status.ok { display: block; }
+  .locked-msg {
+    font-size: 13px;
+    color: var(--muted);
+    text-align: center;
+    padding: 8px 0 0;
+  }
+  .photo-actions {
+    display: flex;
+    gap: 10px;
+  }
+  .photo-actions button {
+    margin-top: 0;
+    font-size: 14px;
+    padding: 12px 8px;
+  }
+  #btn-open-camera {
+    background: var(--primary);
+    color: #fff;
+  }
+  #btn-open-gallery {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+  #camera-wrap {
+    display: none;
+    margin-top: 12px;
+  }
+  #camera-wrap.active { display: block; }
+  #camera-video {
+    width: 100%;
+    border-radius: 10px;
+    background: #000;
+    display: block;
+  }
+  .camera-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  #btn-capture {
+    background: var(--accent);
+    color: #1a2b4c;
+    margin-top: 0;
+  }
+  #btn-cancel-camera {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    margin-top: 0;
+  }
+  .camera-error {
+    display: none;
+    font-size: 13px;
+    color: var(--error);
+    margin-top: 10px;
+    background: #fdecea;
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .camera-error.active { display: block; }
+  #btn-retake {
+    background: transparent;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Registro de Bodega</h1>
+  <p class="subtitle">Selecciona ciudad, locación y bodega. Al completar las tres, podrás tomar la foto.</p>
+
+  <div class="card">
+    <div class="field">
+      <label><span class="step-label" id="dot-ciudad">1</span>Ciudad</label>
+      <select id="ciudad">
+        <option value="">-- Selecciona una ciudad --</option>
+      </select>
+    </div>
+    <div class="field">
+      <label><span class="step-label" id="dot-locacion">2</span>Locación</label>
+      <select id="locacion" disabled>
+        <option value="">-- Selecciona primero la ciudad --</option>
+      </select>
+    </div>
+    <div class="field">
+      <label><span class="step-label" id="dot-bodega">3</span>Bodega</label>
+      <select id="bodega" disabled>
+        <option value="">-- Selecciona primero la locación --</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="card photo-card" id="photo-card">
+    <label><span class="step-label" id="dot-foto">4</span>Foto de la bodega</label>
+
+    <div class="photo-actions" id="photo-actions">
+      <button id="btn-open-camera" type="button">📷 Abrir cámara</button>
+      <button id="btn-open-gallery" type="button">🖼️ Galería</button>
+    </div>
+    <input type="file" id="foto-input" accept="image/*">
+
+    <div class="camera-error" id="camera-error">
+      No se pudo acceder a la cámara. Verifica los permisos del navegador, o usa la opción "Galería".
+    </div>
+
+    <div id="camera-wrap">
+      <video id="camera-video" autoplay playsinline muted></video>
+      <div class="camera-controls">
+        <button id="btn-capture" type="button">Tomar foto</button>
+        <button id="btn-cancel-camera" type="button">Cancelar</button>
+      </div>
+    </div>
+    <canvas id="camera-canvas" style="display:none;"></canvas>
+
+    <div id="preview-wrap">
+      <img id="preview" alt="Vista previa">
+      <button id="btn-retake" type="button">Volver a tomar</button>
+    </div>
+    <div class="summary" id="summary"></div>
+  </div>
+
+  <p class="locked-msg" id="locked-msg">Completa ciudad, locación y bodega para habilitar la foto.</p>
+
+  <button id="btn-download" disabled>Guardar en Drive</button>
+  <button id="btn-reset" type="button">Reiniciar formulario</button>
+  <p class="status" id="status"></p>
+</div>
+
+<script>
+const DATA = {"ARMENIA (Q)": {"CALLE": ["872 - STIRPE 1 CRA. 14 (AXM)", "873 - STIRPE CLL. 19 (AXM)", "876 - DEREK CRA 13 (AXM)", "877 - TRAVEL CRA 14 X17 (AXM)", "878 - STIRPE 3 CRA 14 X 19 (AXM)"]}, "BARRANCABERMEJA": {"CALLE": ["520 - STIRPE ZONA ROSA CLL 49 (EJA)", "660 - DEREK ZONA ROSA (EJA)", "740 - TRAVEL ZONA ROSA CRA 18 (EJA)", "820 - DEREK ZONA ROSA CRA 18 (EJA)", "831 - STIRPE CCIO CL 49 (EJA)", "893 - DEREK COMERCIO (EJA)"], "SAN SILVESTRE": ["548 - TRAVEL SAN SILVESTRE (EJA)", "821 - STIRPE SAN SILVESTRE (EJA)", "890 - DEREK SAN SILVESTRE (EJA)"]}, "BARRANQUILLA": {"ALEGRA": ["539 - DEREK ALEGRA (BAQ)", "541 - STIRPE ALEGRA (BAQ)"], "GRAN PLAZA DEL SOL": ["524 - DEREK GRAN PLAZA DEL SOL (BAQ)", "884 - STIRPE G. PLAZA DEL SOL (BAQ)"], "UNICO": ["534 - FACTORY STORE OUTLET (BAQ)"], "VIVA BARRANQUILLA": ["844 - STIRPE VIVA (BAQ)", "845 - DEREK VIVA (BAQ)"]}, "BOGOTA, D.C.": {"CALLE": ["535 - STIRPE OUTLET LAS AMERICAS (BOG)", "536 - STIRPE OUTLET CRA.7 (BOG)"], "CENTRO MAYOR": ["770 - DEREK CENTRO MAYOR (BOG)"], "EL EDEN": ["881 - DEREK EL EDEN (BOG)", "882 - STIRPE EL EDEN (BOG)"], "ENSUEÑO": ["545 - DEREK ENSUEÑO (BOG)", "546 - STIRPE ENSUEÑO (BOG)"], "GRAN ESTACION": ["790 - DEREK GRAN ESTACION (BOG)", "830 - STIRPE GRAN ESTACION (BOG)"], "LA COLINA": ["864 - STIRPE LA COLINA (BOG)", "865 - DEREK LA COLINA (BOG)"], "LA FELICIDAD": ["846 - DEREK LA FELICIDAD (BOG)"], "PLAZA CENTRAL": ["866 - STIRPE PLAZA CENTRAL (BOG)", "867 - DEREK PLAZA CENTRAL (BOG)"], "PLAZA DE LAS AMÉRICAS": ["780 - DEREK PLAZA DE LAS AMERICAS (BOG)", "781 - STIRPE PLAZA DE LAS AMERICAS (BOG)"], "PORTAL 80": ["533 - STIRPE PORTAL 80 (BOG)"], "SANTAFE BOGOTÁ": ["840 - DEREK SANTAFE (BOG)"], "SIN LOCACION": ["411 - DEREK NUESTRO (BOG)", "412 - U82 NUESTRO (BOG)", "413 - STIRPE NUESTRO (BOG)"], "TITAN": ["557 - U82 SHOES TITAN (BOG)", "894 - STIRPE TITAN (BOG)"], "TUNAL": ["532 - STIRPE TUNAL (BOG)"], "UNICENTRO BOGOTA": ["870 - DEREK UNICENTRO (BOG)"]}, "BUCARAMANGA": {"ACROPOLIS": ["420 - FACTORY ACROPOLIS (BGA)"], "AEROPUERTO": ["552 - U82 ACCESORIOS AEROPUERTO (BGA)", "838 - DEREK AEROPUERTO (BGA)"], "CACIQUE": ["813 - STIRPE 2 CACIQUE (BGA)", "815 - STIRPE CACIQUE (BGA)", "842 - TRAVEL CACIQUE (BGA)", "843 - U82 SHOES CACIQUE (BGA)", "862 - DEREK CACIQUE PISO 1 (BGA)"], "CALLE": ["110 - STIRPE CABECERA (BGA)", "350 - STIRPE CENTRO CRA 18 (BGA)", "670 - TRAVEL CENTRO CLL 36 (BGA)", "822 - FACTORY CENTRO CLL 35 (BGA)", "823 - STIRPE CENTRO CRA 17 (BGA)", "839 - TRAVEL CABECERA CRA 33 (BGA)", "874 - FACTORY CENTRO CLL.36 (BGA)", "897 - DEREK CRA 33 (BGA)"], "CARACOLI": ["554 - U82 ACCESORIOS CARACOLI (BGA)", "817 - DEREK CARACOLI (BGA)", "818 - STIRPE CARACOLI (BGA)"], "CAÑAVERAL": ["190 - STIRPE CAÑAVERAL (BGA)", "200 - DEREK CAÑAVERAL (BGA)", "390 - TRAVEL CAÑAVERAL (BGA)", "490 - UNSER CAÑAVERAL (BGA)", "856 - STIRPE 2 CAÑAVERAL (BGA)", "886 - U82 SHOES CAÑAVERAL (BGA)"], "DELACUESTA": ["826 - STIRPE DELACUESTA (BGA)", "827 - DEREK DELACUESTA (BGA)", "836 - TRAVEL DELACUESTA (BGA)", "852 - U82 SHOES DELACUESTA (BGA)"], "II ETAPA": ["863 - TRAVEL II ETAPA (BGA)"], "IV ETAPA": ["120 - TRAVEL IV ETAPA (BGA)", "140 - STIRPE IV ETAPA (BGA)", "150 - DEREK IV ETAPA (BGA)"], "LA FLORIDA": ["380 - STIRPE LA FLORIDA (BGA)"], "LA ROSITA": ["829 - STIRPE LA ROSITA (BGA)"], "MEGAMALL": ["540 - STIRPE MEGAMALL (BGA)", "550 - DEREK MEGAMALL (BGA)", "880 - TRAVEL MEGAMALL (BGA)", "898 - STIRPE SHOES MEGAM.(BGA)"], "SIN LOCACION": ["414 - STIRPE OUTLET UNICO (BGA)", "799 - TIENDA PRUEBAS BOD. 799"]}, "MANIZALES": {"CALLE": ["887 - STIRPE CRA. 23 (MZL)", "888 - DEREK CRA. 22 (MZL)", "889 - STIRPE CRA. 22 (MZL)", "891 - STIRPE CALLE 28 (MZL)", "892 - DEREK CALLE 28 (MZL)"]}, "PEREIRA": {"ALCIDES": ["250 - STIRPE ALCIDES (PEI)", "460 - DEREK ALCIDES (PEI)", "530 - TRAVEL ALCIDES (PEI)"], "ARBOLEDA": ["810 - DEREK ARBOLEDA (PEI)", "824 - STIRPE ARBOLEDA (PEI)"], "BOLIVAR": ["510 - STIRPE BOLIVAR (PEI)"], "CALLE": ["240 - STIRPE COMERCIO (PEI)", "819 - DEREK COMERCIO CRA 7 (PEI)", "828 - STIRPE PARQUE (PEI)", "847 - FACTORY CRA. 7 (PEI)", "859 - FACTORY CRA. 8 (PEI)", "895 - TRAVEL CENTRO (PEI)"], "UNICENTRO PEREIRA": ["630 - STIRPE UNICENTRO (PEI)", "879 - DEREK UNICENTRO (PEI)"], "VICTORIA": ["440 - STIRPE VICTORIA (PEI)", "620 - TRAVEL VICTORIA (PEI)", "621 - DEREK VICTORIA (PEI)", "640 - UNSER VICTORIA (PEI)", "885 - U82 SHOES VICTORIA (PEI)"]}, "TUNJA": {"VIVA TUNJA": ["551 - DEREK VIVA TUNJA (GUS)"]}, "VALLEDUPAR": {"CALLE": ["841 - DEREK CENTRO CRA 9 (VUP)", "868 - STIRPE CENTRO CRA 7 (VUP)"], "GUATAPURI": ["858 - STIRPE GUATAPURI (VUP)", "861 - DEREK GUATAPURI (VUP)"], "MAYALES": ["833 - DEREK MAYALES (VUP)", "835 - STIRPE MAYALES (VUP)"]}, "VILLAVICENCIO": {"CALLE": ["869 - FACTORY CENTRO (VVC)"], "UNICENTRO VILLAVICENCIO": ["837 - DEREK UNICENTRO (VVC)", "883 - STIRPE UNICENTRO (VVC)"], "VIVA VILLAVICENCIO": ["825 - STIRPE VIVA (VVC)", "851 - DEREK VIVA (VVC)", "871 - TRAVEL VIVA (VVC)"]}};
+
+const ciudadSel = document.getElementById('ciudad');
+const locacionSel = document.getElementById('locacion');
+const bodegaSel = document.getElementById('bodega');
+const photoCard = document.getElementById('photo-card');
+const lockedMsg = document.getElementById('locked-msg');
+const fotoInput = document.getElementById('foto-input');
+const previewWrap = document.getElementById('preview-wrap');
+const preview = document.getElementById('preview');
+const summary = document.getElementById('summary');
+const btnDownload = document.getElementById('btn-download');
+const btnReset = document.getElementById('btn-reset');
+const statusEl = document.getElementById('status');
+
+const photoActions = document.getElementById('photo-actions');
+const btnOpenCamera = document.getElementById('btn-open-camera');
+const btnOpenGallery = document.getElementById('btn-open-gallery');
+const cameraWrap = document.getElementById('camera-wrap');
+const cameraVideo = document.getElementById('camera-video');
+const cameraCanvas = document.getElementById('camera-canvas');
+const btnCapture = document.getElementById('btn-capture');
+const btnCancelCamera = document.getElementById('btn-cancel-camera');
+const btnRetake = document.getElementById('btn-retake');
+const cameraError = document.getElementById('camera-error');
+
+let cameraStream = null;
+
+const dotCiudad = document.getElementById('dot-ciudad');
+const dotLocacion = document.getElementById('dot-locacion');
+const dotBodega = document.getElementById('dot-bodega');
+const dotFoto = document.getElementById('dot-foto');
+
+let fotoBase64 = null;
+
+function populateSelect(select, options, placeholder) {
+  select.innerHTML = '';
+  const opt0 = document.createElement('option');
+  opt0.value = '';
+  opt0.textContent = placeholder;
+  select.appendChild(opt0);
+  options.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o;
+    opt.textContent = o;
+    select.appendChild(opt);
+  });
+}
+
+// Init ciudades
+const ciudades = Object.keys(DATA).sort();
+populateSelect(ciudadSel, ciudades, '-- Selecciona una ciudad --');
+
+ciudadSel.addEventListener('change', () => {
+  dotCiudad.classList.toggle('done', !!ciudadSel.value);
+  locacionSel.value = '';
+  bodegaSel.value = '';
+  bodegaSel.disabled = true;
+  populateSelect(bodegaSel, [], '-- Selecciona primero la locación --');
+  dotLocacion.classList.remove('done');
+  dotBodega.classList.remove('done');
+
+  if (ciudadSel.value) {
+    const locaciones = Object.keys(DATA[ciudadSel.value]).sort();
+    populateSelect(locacionSel, locaciones, '-- Selecciona una locación --');
+    locacionSel.disabled = false;
+  } else {
+    populateSelect(locacionSel, [], '-- Selecciona primero la ciudad --');
+    locacionSel.disabled = true;
+  }
+  updatePhotoGate();
+});
+
+locacionSel.addEventListener('change', () => {
+  dotLocacion.classList.toggle('done', !!locacionSel.value);
+  bodegaSel.value = '';
+  dotBodega.classList.remove('done');
+
+  if (locacionSel.value) {
+    const bodegas = DATA[ciudadSel.value][locacionSel.value].slice().sort();
+    populateSelect(bodegaSel, bodegas, '-- Selecciona una bodega --');
+    bodegaSel.disabled = false;
+  } else {
+    populateSelect(bodegaSel, [], '-- Selecciona primero la locación --');
+    bodegaSel.disabled = true;
+  }
+  updatePhotoGate();
+});
+
+bodegaSel.addEventListener('change', () => {
+  dotBodega.classList.toggle('done', !!bodegaSel.value);
+  updatePhotoGate();
+});
+
+function allFieldsComplete() {
+  return !!(ciudadSel.value && locacionSel.value && bodegaSel.value);
+}
+
+function updatePhotoGate() {
+  if (allFieldsComplete()) {
+    photoCard.classList.add('active');
+    lockedMsg.style.display = 'none';
+  } else {
+    photoCard.classList.remove('active');
+    lockedMsg.style.display = 'block';
+    resetPhoto();
+  }
+}
+
+function resetPhoto() {
+  fotoBase64 = null;
+  fotoInput.value = '';
+  previewWrap.classList.remove('active');
+  dotFoto.classList.remove('done');
+  btnDownload.disabled = true;
+  summary.innerHTML = '';
+  photoActions.style.display = 'flex';
+  stopCamera();
+}
+
+function setFoto(dataUrl) {
+  fotoBase64 = dataUrl;
+  preview.src = fotoBase64;
+  previewWrap.classList.add('active');
+  photoActions.style.display = 'none';
+  dotFoto.classList.add('done');
+  btnDownload.disabled = !allFieldsComplete();
+  renderSummary();
+}
+
+// --- Galería (input file) ---
+btnOpenGallery.addEventListener('click', () => {
+  cameraError.classList.remove('active');
+  fotoInput.click();
+});
+
+fotoInput.addEventListener('change', () => {
+  const file = fotoInput.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => setFoto(e.target.result);
+  reader.readAsDataURL(file);
+});
+
+// --- Cámara en vivo (getUserMedia) ---
+async function openCamera() {
+  cameraError.classList.remove('active');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    cameraError.textContent = 'Este navegador no soporta acceso a la cámara. Usa la opción "Galería".';
+    cameraError.classList.add('active');
+    return;
+  }
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false
+    });
+    cameraVideo.srcObject = cameraStream;
+    cameraWrap.classList.add('active');
+    photoActions.style.display = 'none';
+  } catch (err) {
+    cameraError.textContent = 'No se pudo abrir la cámara (' + (err && err.message ? err.message : 'permiso denegado') + '). Verifica los permisos del navegador o usa "Galería".';
+    cameraError.classList.add('active');
+  }
+}
+
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  cameraVideo.srcObject = null;
+  cameraWrap.classList.remove('active');
+}
+
+btnOpenCamera.addEventListener('click', openCamera);
+
+btnCancelCamera.addEventListener('click', () => {
+  stopCamera();
+  photoActions.style.display = 'flex';
+});
+
+btnCapture.addEventListener('click', () => {
+  const w = cameraVideo.videoWidth;
+  const h = cameraVideo.videoHeight;
+  if (!w || !h) return;
+  cameraCanvas.width = w;
+  cameraCanvas.height = h;
+  const ctx = cameraCanvas.getContext('2d');
+  ctx.drawImage(cameraVideo, 0, 0, w, h);
+  const dataUrl = cameraCanvas.toDataURL('image/jpeg', 0.9);
+  stopCamera();
+  setFoto(dataUrl);
+});
+
+btnRetake.addEventListener('click', () => {
+  previewWrap.classList.remove('active');
+  photoActions.style.display = 'flex';
+  fotoBase64 = null;
+  dotFoto.classList.remove('done');
+  btnDownload.disabled = true;
+});
+
+function renderSummary() {
+  summary.innerHTML =
+    '<b>Ciudad:</b> ' + ciudadSel.value + '<br>' +
+    '<b>Locación:</b> ' + locacionSel.value + '<br>' +
+    '<b>Bodega:</b> ' + bodegaSel.value;
+}
+
+btnDownload.addEventListener('click', async () => {
+  if (!allFieldsComplete() || !fotoBase64) return;
+
+  // Bloquear botón mientras envía
+  btnDownload.disabled = true;
+  btnDownload.textContent = 'Enviando a Drive...';
+  statusEl.textContent = 'Procesando...';
+  statusEl.classList.add('ok');
+  statusEl.style.color = 'var(--text)';
+
+  const registro = {
+    ciudad: ciudadSel.value,
+    locacion: locacionSel.value,
+    bodega: bodegaSel.value,
+    foto_base64: fotoBase64,
+    fecha_registro: new Date().toISOString().split('T')[0]
+  };
+
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyY7YAxoklqsSTJYgCqTqy8ldvEa-yOOIJGK-E8vZcQnZeh7rAWmkQjIa3AWgMcIjso/exec'; 
+
+  try {
+    const response = await fetch(scriptURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(registro)
+    });
+
+    const result = await response.json();
+
+    if (result.status === 'success') {
+      statusEl.textContent = '¡Registro guardado en Drive exitosamente!';
+      statusEl.style.color = 'var(--success)';
+      setTimeout(() => {
+        statusEl.classList.remove('ok');
+        btnReset.click(); 
+        btnDownload.textContent = 'Guardar en Drive';
+      }, 4000);
+    } else {
+      throw new Error(result.message);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    statusEl.textContent = 'Error de conexión. Intenta de nuevo.';
+    statusEl.style.color = 'var(--error)';
+    btnDownload.disabled = false;
+    btnDownload.textContent = 'Reintentar';
+  }
+});
+
+btnReset.addEventListener('click', () => {
+  ciudadSel.value = '';
+  ciudadSel.dispatchEvent(new Event('change'));
+  statusEl.classList.remove('ok');
+});
+
+window.addEventListener('beforeunload', stopCamera);
+</script>
+</body>
+</html>
