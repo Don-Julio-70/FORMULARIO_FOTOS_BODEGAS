@@ -505,8 +505,8 @@ btnDownload.addEventListener('click', async () => {
     ciudad: ciudadSel.value,
     locacion: locacionSel.value,
     bodega: bodegaSel.value,
-    foto_base64: fotoBase64,
-    fecha_registro: new Date().toISOString().split('T')[0]
+    fecha_registro: new Date().toISOString().split('T')[0],
+    foto_base64: fotoBase64
   };
 
   const scriptURL = 'https://script.google.com/macros/s/AKfycbyY7YAxoklqsSTJYgCqTqy8ldvEa-yOOIJGK-E8vZcQnZeh7rAWmkQjIa3AWgMcIjso/exec'; 
